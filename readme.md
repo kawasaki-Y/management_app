@@ -25,7 +25,7 @@ https://amzn.asia/d/8OK4WEj
 
 ## ②課題内容（どんな作品か）
 
-この課題はPythonで作成しており、データベース操作にはsqlite3を使っています。
+この課題はPythonで作成しており、PHPとPythonの連携は分からなかったので、データベース操作にはsqlite3を使っています。
 今回は前回の課題にユーザー登録機能、ログイン機能、DB編集及び削除（sales_management.pyの売上管理のところ）を加えています。
 
 データベースの設計はdatabase.pyファイルをご覧ください。
@@ -35,7 +35,12 @@ https://amzn.asia/d/8OK4WEj
 【課題提出上、必須の機能】
 
 ・ユーザー登録機能とログイン機能の設定　⇨　dashboard.pyファイルで設定。def関数を使って設定。
-・ユーザー登録機能とログイン機能の表示　⇨　
+・ユーザー登録機能とログイン機能の表示　⇨　同上
+def login_page():
+    st.title("ログイン")
+⇨login_pageという名前の関数を定義して、呼び出すことでログインページのUIを表示します。
+
+・DB登録項目の削除と編集機能　⇨ ・tags_and_target.py ファイルとsales_management.pyファイルで設定。
 
 
 その他
@@ -56,26 +61,7 @@ streamlit Cloud : https://streamlit.io/generative-ai
 なし
 
 ## ⑤工夫した点・こだわった点
-- 前回の課題提出でクリアにならなかった点は、次の通りに解決しました。
-❶データベース設計
-・複数のテーブルを統一的に管理し、データの整合性を確保した。
-・SQLite データベースを使用し、今回の課題テーマである簡易的なデータ登録と参照を実装。
-❷機能の汎用性
-・売上データをタグ付けして分類・集計が可能。
-・年間目標売上と実績の予実比較を資格的に確認できるようにした。
-❸UI/UX
-・Streamlit を活用し、ユーザーが直感的に操作できる見た目で整えた。
-・Altairライブラリ を利用した数値のグラフ化。⇨
-❹データエクスポート
-・SQL ファイルへのダウンロード。今回の課題テーマでSQLファイル提出があったため、この機能を盛り込んだ。
-❺Python 構文の理解
-・FOR文やCLASS構造 を活用して効率的なコード記述。
-・DICT関数 で柔軟なデータ操作を実現。
-・fタグとリスト内包表記を使った、見やすいコード記述。
-
-- それ以外は次の通りです。
-❶Pythonのライブラリを色々と試してみました。使用したライブラリは「requirements.txt」にまとめています。
-❷Excelダウンロード時のヘッターの設定をしてます。この辺の設定は、JavaScriptよりもPythonの方が柔軟に設定できます。
+・関数の定義は
 
 
 ## ⑥難しかった点・次回トライしたいこと(又は機能)
@@ -87,7 +73,51 @@ streamlit Cloud : https://streamlit.io/generative-ai
 
 ## ⑦質問・疑問・感想、シェアしたいこと等なんでも
 
-❶本プロジェクトでは、効率的なデータ操作と拡張性を考慮した SQLite を使用し、以下のテーブルを設計しました：
+❶条件分岐
+if st.button("ログイン", key="login_button"):
+    user = Database.fetch_data(
+        "SELECT * FROM users WHERE username = ? AND password = ?", (username, password)
+    )
+    if user:
+        st.success("ログイン成功！")
+
+if文で条件を指定するだけで簡単に分岐処理を実現して、
+英語を読むような感覚で「もしボタンが押されたら…」というロジックにより、ログインボタンがクリックされたときに処理を実行します
+
+また if-elif-else構文を使って、複数の条件を処理しています。
+
+if menu == "初期設定登録":
+    tags_and_target_page()
+elif menu == "売上管理":
+    sales_management_page()
+elif menu == "ログアウト":
+    st.session_state["authenticated"] = False
+
+
+
+❷オブジェクトの構築
+Database.execute_query(
+    "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
+)
+*Database**はクラス（オブジェクト）を設定して、execute_queryというメソッドを呼び出してSQLを実行。
+
+
+def login_page():
+    st.title("ログイン")
+    username = st.text_input("ユーザー名", key="login_username")
+    password = st.text_input("パスワード", type="password", key="login_password")
+    if st.button("ログイン", key="login_button"):
+        user = Database.fetch_data(
+            "SELECT * FROM users WHERE username = ? AND password = ?", (username, password)
+        )
+        if user:
+            st.success("ログイン成功！")
+クラスではなくてdefキーワードを使ってオブジェクトの構築を多用してます
+
+❸
+
+
+❸（前回に引き続き）本プロジェクトでは、効率的なデータ操作と拡張性を考慮した SQLite を使用し、以下のテーブルを設計しました：
 
 「sales（売上データ）」
 案件ごとの売上情報を管理。
@@ -121,7 +151,7 @@ tag_name (タグ名): タグの名前。
 各テーブルは独立してデータを管理しながらも、売上データと連携可能してます。
 
 
-❷Python 構文の活用
+❹（前回に引き続き）Python 構文の活用
 このプロジェクトでは、Pythonの豊富な構文やデザインパターンを活用して、効率的で拡張性の高いコードを構築しました。
 1. クラス設計（Database クラス）
 役割:
